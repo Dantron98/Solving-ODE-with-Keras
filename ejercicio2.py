@@ -4,16 +4,15 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.optimizers import RMSprop, Adam
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+
 import numpy as np
 
 class ODEsolver(Sequential):
-    def _init_(self, **kwargs):
-        super()._init_(**kwargs)
-        self.loss_tracker = keras.metrics.Mean(name='loss')
 
-    @property
-    def metrics(self):
-        return [keras.metrics.Mean(name='loss')]
+    loss_tracker = keras.metrics.Mean(name="loss")
+
     def train_step(self, data):
 
         batch_size = tf.shape(data)[0]
@@ -35,6 +34,10 @@ class ODEsolver(Sequential):
         self.loss_tracker.update_state(loss)
         return {"loss": self.loss_tracker.result()}
 
+        @property
+        def metrics(self):
+            return [keras.metrics.Mean(name='loss')]
+
 
 model = ODEsolver()
 model.add(Dense(10, activation='tanh', input_shape=(1,)))
@@ -47,11 +50,11 @@ model.compile(optimizer=RMSprop(), metrics=['loss'])
 
 x = tf.linspace(-5, 5, 100)
 history = model.fit(x, epochs=500, verbose=1)
-
 x_testv = tf.linspace(-5, 5, 100)
+y = [((x*np.sin(x))+(2*np.cos(x))-((2/x)*np.sin(x))) for x in x_testv]
 a = model.predict(x_testv)
 plt.plot(x_testv, a)
-#plt.plot(x_testv, np.exp(-x*x))
+plt.plot(x_testv, y)
 plt.show()
 exit()
 
