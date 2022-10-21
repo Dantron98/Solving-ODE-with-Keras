@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('TkAgg')
 import numpy as np
-#Hoola mundo 3
+
 class ODEsolver(Sequential):
     loss_tracker = keras.metrics.Mean(name="loss")
 
@@ -45,7 +45,7 @@ model.summary()
 
 model.compile(optimizer=RMSprop(), metrics=['loss'])
 tf.keras.layers.Dropout(.25, input_shape=(2,))
-x = tf.linspace(-5, 5, 1000)
+x = tf.linspace(-5, 5, 100)
 history = model.fit(x, epochs=1000, verbose=1)
 
 x_testv = tf.linspace(-5, 5, 1000)
@@ -54,9 +54,12 @@ y = [((x*np.sin(x))+(2*np.cos(x))-((2/x)*np.sin(x))) for x in x_testv]
 a = model.predict(x_testv)
 plt.grid()
 plt.title('Solución encontrada por la red vs solución analitica')
-plt.plot(x_testv, a)
-plt.plot(x_testv, y)
-plt.savefig('commit1.png')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.plot(x_testv, a, '-', label='Solución de la red')
+plt.plot(x_testv, y, label='Solución análitica')
+plt.legend()
+plt.savefig('commit2.png')
 plt.show()
 model.save('red2.1.h5')
 exit()
