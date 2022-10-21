@@ -15,21 +15,24 @@ matplotlib.use('TkAgg')
 class ODEsolver(Sequential):
     loss_tracker = keras.metrics.Mean(name="loss")
     def train_step(self, data):
-        x = tf.random.uniform((80, 1), minval=-5, maxval=5)
+        batch_size = tf.shape(data)[0]
+        x = tf.random.uniform((batch_size, 1), minval=-1, maxval=1)
 
         with tf.GradientTape() as tape:
             with tf.GradientTape() as tape2:
                 tape2.watch(x)
                 y_pred = self(x, training=True)
-            x_o = tf.zeros((80, 1))
+            dy = tape2.gradient(y_pred, x)
+            x_o = tf.zeros((batch_size, 1))
+            x_1 = x_o + 1
             y_o = self(x_o, training=True)
             y_1 = self(x_o, training=True)
-            y_2 = self(x_o, training=True)
+            y_2 = self(x_1, training=True)
+            eq = dy - 3 * pi * keras.backend.cos(pi * x)
             ic = y_o - 3
-            # ic1 = y_1
-            # ic2 = y_2
-            eq = 3 * keras.backend.sin(pi * x)
-            loss = keras.losses.mean_squared_error(0., eq) + keras.losses.mean_squared_error(0., ic) #+ keras.losses.mean_squared_error(0., ic1) + keras.losses.mean_squared_error(0., ic2)
+            ic2 = y_1 + 3
+            ic3 = y_2
+            loss = keras.losses.mean_squared_error(0., eq) + 10*keras.losses.mean_squared_error(0., ic) + 10*keras.losses.mean_squared_error(0., ic2) + 10*keras.losses.mean_squared_error(0., ic3)
 
         grads = tape.gradient(loss, self.trainable_variables)
         self.optimizer.apply_gradients(zip(grads, self.trainable_variables))
@@ -64,7 +67,7 @@ plt.ylabel('y')
 plt.plot(x_testv, a, '-', label='Solución de la red')
 plt.plot(x_testv, y, label='Solución análitica')
 plt.legend()
-plt.savefig('commit1.png')
+plt.savefig('commit2.png')
 plt.show()
 model.save('red2.1.h5')
 exit()
