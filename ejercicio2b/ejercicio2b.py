@@ -28,7 +28,7 @@ class ODEsolver(Sequential):
             eq = dy2 + y_pred
             ic = y_0 - 1
             ic2 = dy + 0.5
-            loss = keras.losses.mean_squared_error(0., eq) + keras.losses.mean_squared_error(0., ic) + keras.losses.mean_squared_error(0., ic2)
+            loss = keras.losses.mean_squared_error(0., eq) + (1/3)*keras.losses.mean_squared_error(0., ic) + (.25/900)*keras.losses.mean_squared_error(0., ic2)
 
         grads = tape.gradient(loss, self.trainable_variables)
         self.optimizer.apply_gradients(zip(grads, self.trainable_variables))
@@ -63,7 +63,7 @@ plt.ylabel('y')
 plt.plot(x_testv, a, '-', label='Solución de la red')
 plt.plot(x_testv, y, label='Solución análitica')
 plt.legend()
-plt.savefig('commit1.png')
+plt.savefig('commit2.png')
 plt.show()
 
 model.save('red2.1.h5')
